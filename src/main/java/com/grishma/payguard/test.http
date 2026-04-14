@@ -1,0 +1,32 @@
+### Test 1 — Safe transaction (LOW risk)
+POST http://localhost:8080/api/transactions/assess
+Content-Type: application/json
+
+{
+  "id": "TXN001",
+  "amount": 5000,
+  "type": "DEBIT",
+  "accountId": "ACC123"
+}
+
+### Test 2 — Medium risk transaction
+POST http://localhost:8080/api/transactions/assess
+Content-Type: application/json
+
+{
+  "id": "TXN002",
+  "amount": 25000,
+  "type": "DEBIT",
+  "accountId": "ACC456"
+}
+
+### Test 3 — HIGH risk, should be BLOCKED
+POST http://localhost:8080/api/transactions/assess
+Content-Type: application/json
+
+{
+  "id": "TXN003",
+  "amount": 95000,
+  "type": "DEBIT",
+  "accountId": "ACC789"
+}

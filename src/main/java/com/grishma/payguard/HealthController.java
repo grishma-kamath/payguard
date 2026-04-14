@@ -1,9 +1,7 @@
 package com.grishma.payguard;
 
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.Map;
@@ -11,6 +9,12 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 public class HealthController {
+
+    private final FraudService fraudService;
+
+    public HealthController(FraudService fraudService) {
+        this.fraudService = fraudService;
+    }
 
     @GetMapping("/health")
     public ResponseEntity<Map<String, Object>> health() {
@@ -20,5 +24,11 @@ public class HealthController {
                 "version", "1.0.0",
                 "timestamp", LocalDateTime.now().toString()
         ));
+    }
+
+    @PostMapping("/transactions/assess")
+    public ResponseEntity<FraudAssessment> assess(@RequestBody TransactionRequest request) {
+        FraudAssessment assessment = fraudService.assess(request);
+        return ResponseEntity.ok(assessment);
     }
 }
