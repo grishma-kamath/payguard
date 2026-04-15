@@ -1,5 +1,6 @@
 package com.grishma.payguard;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,7 +28,7 @@ public class HealthController {
     }
 
     @PostMapping("/transactions/assess")
-    public ResponseEntity<FraudAssessment> assess(@RequestBody TransactionRequest request) {
+    public ResponseEntity<FraudAssessment> assess(@Valid @RequestBody TransactionRequest request) {
         FraudAssessment assessment = fraudService.assess(request);
         return ResponseEntity.ok(assessment);
     }
