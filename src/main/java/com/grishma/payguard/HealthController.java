@@ -1,10 +1,13 @@
 package com.grishma.payguard;
 
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
@@ -27,8 +30,22 @@ public class HealthController {
     }
 
     @PostMapping("/transactions/assess")
-    public ResponseEntity<FraudAssessment> assess(@RequestBody TransactionRequest request) {
+    public ResponseEntity<FraudAssessment> assess(@Valid @RequestBody TransactionRequest request) {
+        validateTransactionType(request.type());
         FraudAssessment assessment = fraudService.assess(request);
         return ResponseEntity.ok(assessment);
+    }
+
+    private void validateTransactionType(String type) {
+        try {
+            TransactionType.valueOf(type.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            String validTypes = Arrays.stream(TransactionType.values())
+                    .map(Enum::name)
+                    .collect(Collectors.joining(", "));
+            throw new IllegalArgumentException(
+                    "Invalid transaction type: '" + type + "'. Valid types are: " + validTypes
+            );
+        }
     }
 }
