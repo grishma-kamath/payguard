@@ -12,9 +12,11 @@ import java.util.Map;
 public class HealthController {
 
     private final FraudService fraudService;
+    private final TransactionProducer transactionProducer;
 
-    public HealthController(FraudService fraudService) {
+    public HealthController(FraudService fraudService, TransactionProducer transactionProducer) {
         this.fraudService = fraudService;
+        this.transactionProducer = transactionProducer;
     }
 
     @GetMapping("/health")
@@ -28,9 +30,13 @@ public class HealthController {
     }
 
     @PostMapping("/transactions/assess")
-    public ResponseEntity<FraudAssessment> assess(@RequestBody TransactionRequest request) {
-        FraudAssessment assessment = fraudService.assess(request);
-        return ResponseEntity.ok(assessment);
+    public ResponseEntity<Map<String, Object>> assess(@RequestBody TransactionRequest request) {
+        transactionProducer.sendTransaction(request);
+        return ResponseEntity.accepted().body(Map.of(
+                "status", "RECEIVED",
+                "transactionId", request.id(),
+                "message", "Transaction queued for fraud assessment"
+        ));
     }
 
     @GetMapping("/transactions")
